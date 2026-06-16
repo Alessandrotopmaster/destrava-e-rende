@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#14b8a6">
+    <title>Destrava e Rende | Minha Loja</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { theme: { extend: { colors: { principal: '#14b8a6' } } } }
+    </script>
+</head>
+<body class="bg-slate-50 text-slate-800 m-0 p-0 font-sans">
+<div id="login" style="position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:999;">
+    <div class="bg-white p-5 rounded-xl w-full max-w-sm">
+        <h2 class="text-center text-lg font-bold mb-4">🔐 Acesso da Loja</h2>
+        <input type="text" id="codigo" placeholder="Código da Loja" class="w-full p-2 mb-3 border rounded">
+        <input type="password" id="senha" placeholder="Senha" class="w-full p-2 mb-3 border rounded">
+        <button onclick="entrarLoja()" class="w-full bg-[#14b8a6] text-white p-2 rounded">Entrar</button>
+    </div>
+</div>
+<header class="bg-[#14b8a6] text-white p-4" style="display:none" id="cabecalho">
+    <h1 class="text-lg font-bold">🏪 Destrava e Rende</h1>
+    <span id="nomeLojaLogada"></span>
+</header>
+<main class="p-4" style="display:none" id="conteudo">
+    <h3 class="text-lg font-semibold mb-3">Meus Pedidos</h3>
+    <div id="listaPedidosLoja"></div>
+</main>
+<script>
+let lojaLogada = null;
+const lojas = JSON.parse(localStorage.getItem('lojas')) || [];
+const pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+
+function entrarLoja() {
+    const cod = document.getElementById('codigo').value;
+    const senha = document.getElementById('senha').value;
+    lojaLogada = lojas.find(l => l.id == cod && l.senha == senha);
+    if(!lojaLogada) return alert('Código ou senha incorretos');
+    document.getElementById('login').style.display = 'none';
+    document.getElementById('cabecalho').style.display = 'block';
+    document.getElementById('conteudo').style.display = 'block';
+    document.getElementById('nomeLojaLogada').textContent = lojaLogada.nome;
+    carregarPedidos();
+}
+
+function carregarPedidos() {
+    const div = document.getElementById('listaPedidosLoja');
+    const meus = pedidos.filter(p => p.lojaId == lojaLogada.id);
+    div.innerHTML = meus.length ? meus.map(p => `<div class="bg-white p-3 rounded shadow mb-2">
+        <strong>Pedido #${p.id}</strong><br>
+        Cliente: ${p.nome}<br>
+        Itens: ${p.itens}<br>
+        Valor: R$ ${Number(p.valor).toFixed(2).replace('.', ',')}
+    </div>`).join('') : '<p>Nenhum pedido recebido</p>';
+}
+</script>
+</body>
+</html>
