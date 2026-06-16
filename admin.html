@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Destrava e Rende - Sistema de Gestão">
+    <title>Destrava e Rende | Admin</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        escuro: '#0f172a', medio: '#1e293b', claro: '#e2e8f0',
+                        destaque: '#2563eb', sucesso: '#10b981', alerta: '#f59e0b', erro: '#ef4444',
+                        renda: '#84cc16', loja: '#14b8a6', link: '#9333ea', pedido: '#f97316',
+                        parceiro: '#8b5cf6', trafego: '#7C3AED'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .conteudo { display: none; }
+        .conteudo.ativo { display: block; }
+        .aba { padding: 8px 12px; border-radius: 8px; background: #1e293b; color: #e2e8f0; border: none; cursor: pointer; margin: 2px; }
+        .aba.ativa { background: #2563eb; }
+        .card { background: #1e293b; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin: 10px 0; }
+    </style>
+</head>
+<body class="bg-[#0f172a] text-[#e2e8f0] m-0 p-0 font-sans">
+
+<div id="login" style="position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;align-items:center;justify-content:center;z-index:999;">
+    <div class="card w-full max-w-sm">
+        <h2 class="text-center text-xl font-bold mb-4">🔐 Destrava e Rende</h2>
+        <input type="password" id="senha" placeholder="Senha" class="w-full p-2 rounded bg-[#0f172a] border border-slate-600 mb-3">
+        <button onclick="entrar()" class="w-full bg-[#2563eb] p-2 rounded text-white">Acessar</button>
+    </div>
+</div>
+
+<header class="p-4">
+    <h1 class="text-2xl font-bold">🚀 Destrava e Rende</h1>
+    <p class="text-slate-400">Conecta, destrava e rende mais</p>
+</header>
+
+<nav class="p-2 overflow-x-auto">
+    <button class="aba ativa" onclick="mostrar('parceiros')">🤝 Parceiros</button>
+    <button class="aba" onclick="mostrar('pedidos')">📦 Pedidos</button>
+    <button class="aba" onclick="mostrar('financeiro')">💰 Ganhos</button>
+</nav>
+
+<main class="p-4">
+    <section id="parceiros" class="conteudo ativo">
+        <div class="card">
+            <h3 class="text-lg font-semibold mb-3">Cadastrar Loja</h3>
+            <input type="text" id="nomeLoja" placeholder="Nome da Loja" class="w-full p-2 mb-2 rounded bg-[#0f172a] border border-slate-600">
+            <input type="text" id="contatoLoja" placeholder="WhatsApp" class="w-full p-2 mb-2 rounded bg-[#0f172a] border border-slate-600">
+            <input type="number" step="0.1" id="comissao" placeholder="Comissão %" class="w-full p-2 mb-3 rounded bg-[#0f172a] border border-slate-600">
+            <button onclick="cadastrarLoja()" class="bg-[#8b5cf6] w-full p-2 rounded">Salvar</button>
+        </div>
+        <div id="listaLojas"></div>
+    </section>
+
+    <section id="pedidos" class="conteudo">
+        <div class="card">
+            <h3 class="text-lg font-semibold mb-3">Pedidos Recebidos</h3>
+            <div id="listaPedidos"></div>
+        </div>
+    </section>
+
+    <section id="financeiro" class="conteudo">
+        <div class="card text-center">
+            <h3 class="text-lg font-semibold mb-3">Resumo</h3>
+            <p class="text-xl">Total: R$ <span id="totalGanhos">0,00</span></p>
+        </div>
+    </section>
+</main>
+
+<script>
+let lojas = JSON.parse(localStorage.getItem('lojas')) || [];
+let pedidos = JSON.parse(localStorage.getItem('pedidos')) || [];
+const senhaAdmin = "1234";
+
+function formatarMoeda(v) { return Number(v).toFixed(2).replace('.', ','); }
+function entrar() { if(document.getElementById('senha').value === senhaAdmin) document.getElementById('login').style.display = 'none'; else alert('Senha errada'); }
+function mostrar(id) { document.querySelectorAll('.conteudo').forEach(c => c.classList.remove('ativa')); document.getElementById(id).classList.add('ativa'); }
+
+function cadastrarLoja() {
+    const nome = document.getElementById('nomeLoja').value.trim();
+    const contato = document.getElementById('contatoLoja').value.trim();
+    const comissao = parseFloat(document.getElementById('comissao').value) || 0;
+    if(!nome || !contato) return alert('Preencha tudo');
+    const nova = { id: Date.now(), nome, contato, comissao, senha: Math.floor(1000 + Math.random()*9000) };
+    lojas.push(nova); localStorage.setItem('lojas', JSON.stringify(lojas)); atualizarLojas();
+    alert(`Cadastrado! Código: ${nova.id} | Senha: ${nova.senha}`);
+}
+
+function atualizarLojas() {
+    const div = document.getElementById('listaLojas');
+    div.innerHTML = lojas.map(l => `<div class="card">
+        <strong>${l.nome}</strong><br>
+        Contato: ${l.contato}<br>
+        Comissão: ${l.comissao}% | Código: ${l.id}
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
