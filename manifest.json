@@ -1,0 +1,11 @@
+{
+    "name": "Destrava e Rende",
+    "short_name": "DestravaRende",
+    "start_url": "/admin.html",
+    "display": "standalone",
+    "background_color": "#0f172a",
+    "theme_color": "#2563eb",
+    "icons": [
+        { "src": "icone.png", "sizes": "192x192", "type": "image/png" }
+    ]
+}
